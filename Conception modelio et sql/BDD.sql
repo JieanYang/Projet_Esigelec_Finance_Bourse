@@ -19,9 +19,7 @@ CREATE TABLE if not exists Ressources(
 	Dividende float(4),
 	Rendement float(4),
 	PER float(4),
-	Actualité text,
-
-	PRIMARY KEY(date_action)
+	Actualité text
 );
 
 CREATE TABLE if not exists portefeuille (
