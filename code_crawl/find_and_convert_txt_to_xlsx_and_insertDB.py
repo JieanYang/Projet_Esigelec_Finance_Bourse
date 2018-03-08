@@ -6,6 +6,7 @@ import datetime
 import time
 import xlsxwriter
 from selenium import webdriver
+from bs4 import BeautifulSoup
 import os
 import shutil
 
@@ -59,9 +60,6 @@ def convert_to_xlsx(nom):
 
 
 def download_text(nom):
-	# import time
-	
-	
 	driver = webdriver.Chrome()
 	driver.get(bourse_link[nom])
 	driver.find_element_by_id("ctl00_BodyABC_txtFrom").clear()
@@ -84,7 +82,7 @@ def move_text(nom):
 	shutil.move(path_download + bourse_file_name[nom] + '.txt', path_projet + bourse_file_name[nom] + '.txt')
 	os.chdir(path_projet)
 
-def insert_db():
+def insert_db_data_history():
 	db = MySQLdb.Connect(host="127.0.0.1", port=3306, user="root", passwd="", db="bdd_if")
 	cursor = db.cursor()
 
@@ -121,20 +119,100 @@ def insert_db():
 
 	db.close()
 
-def main(nom):
+def crawl_data_action_prix_5(nom):
 	download_text(nom)
 	time.sleep(3)
 	move_text(nom)
 	time.sleep(3)
 	convert_to_xlsx(nom)
+# ---------------------------------------------------------------------------------------------------------
+def crawl_data_action_analyse_actualite():
+	bourse_data_analyse_link = {'Sopra Steria Group': 'http://www.boursorama.com/cours.phtml?symbole=1rPSOP',\
+								'Korian': 'http://www.boursorama.com/cours.phtml?symbole=1rPKORI',\
+								'Airbus': 'http://www.boursorama.com/cours.phtml?symbole=1rPAIR',\
+								'L_oreal': 'http://www.boursorama.com/cours.phtml?symbole=1rPOR',\
+								'Biomerieux': 'http://www.boursorama.com/cours.phtml?symbole=1rPBIM'}
+	data_analyse_actualite = {'Sopra Steria Group': [],\
+								'Korian': [],\
+								'Airbus': [],\
+								'L_oreal': [],\
+								'Biomerieux': []}
+
+	driver = webdriver.Chrome()
+
+	for i in range(5):
+		driver.get(bourse_data_analyse_link[bourse_name[i]]) # 暂时
+		html = driver.find_element_by_id("AnalystsPrevisions").get_attribute('outerHTML')
+		soup = BeautifulSoup(html, features="lxml")
+		analyse_table = soup.find(id="prev-list")
+		analyse_all_tr = analyse_table.find_all("tr")
+		for tr in analyse_all_tr:
+			td_all = tr.find_all('td')
+			k = 0
+			for td in td_all:
+				if(k == 1):
+					data_analyse_actualite[bourse_name[i]].append(td.string.encode('utf-8'))
+				k = k + 1
+	print(data_analyse_actualite)
+	driver.close()
+
+
+	wb = xlsxwriter.Workbook('data_analyse_actualite.xlsx')  
+	#新建一个sheet  
+	sheet = wb.add_worksheet('data')
+
+	labels = ['nom', 'BNA', 'Dividende', 'Rendement', 'PER', 'actualite']
+	sheet.write_row(0,0,labels)
+	for i in range(5):
+		sheet.write_row(i+1, 0, [bourse_name[i]] + data_analyse_actualite[bourse_name[i]])
+	wb.close()
+
+
+def insertDB_data_analyse():
+	db = MySQLdb.Connect(host="127.0.0.1", port=3306, user="root", passwd="", db="bdd_if")
+	cursor = db.cursor()
+
+	data = xlrd.open_workbook('data_analyse_actualite.xlsx')
+	table = data.sheet_by_name(u'data')
+	nrows = table.nrows
+
+	for i in range(nrows-1):
+		data_analyse_actualite = table.row_values(i+1)
+		sql = "UPDATE ressources \
+		SET BNA=%f,Dividende=%f, Rendement=%f, PER=%f \
+		WHERE nom_action = '%s'" % (float(data_analyse_actualite[1].encode('utf-8')), \
+			float(data_analyse_actualite[2].encode('utf-8')), \
+			float(data_analyse_actualite[3].encode('utf-8')[0:-1])*0.01, \
+			float(data_analyse_actualite[4].encode('utf-8')), \
+			data_analyse_actualite[0].encode('utf-8'))
+
+		try:
+			cursor.execute(sql)
+			results = cursor.fetchall()
+			db.commit()
+		except:
+			db.rollback()
+			print('error of sql operation!')
+
+	db.close()
+
+
+
+
+# ---------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
-	print('Star . . .')
+	print('Start crawl data history . . .')
 	for i in range(5):
-		main(bourse_name[i])
-	insert_db()
-	print('finished');
+		crawl_data_action_prix_5(bourse_name[i])
+	insert_db_data_history()
+	print('Finished crawl data history!');
 
+
+	print('Start crawl data base . . .')
+	crawl_data_action_analyse_actualite()
+	insertDB_data_analyse()
+	print('Finished crawl data base')
 
 	# print(type(datetime.datetime.now()-datetime.timedelta(days=30)))
 	# print(str(datetime.datetime.now()-datetime.timedelta(days=30)))
