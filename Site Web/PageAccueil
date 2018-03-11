@@ -1,0 +1,19 @@
+<html>
+<body>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+    <h2 id="soutenances">Gestionnaire d'actions</h2>
+    <div class="container">
+        <h3 class="bg-info text-light">Choix d'une action</h3>
+        <form>
+        <input type="radio" name="gender" value="male" checked>Sopra Steria<br>
+        <input type="radio" name="gender" value="female">Airbus<br>
+        <input type="radio" name="gender" value="female">L'Oreal<br>
+        <input type="radio" name="gender" value="female">Korian<br>
+        <input type="radio" name="gender" value="female">Biomérieux<br>
+        <input type="radio" name="gender" value="female">Danone<br>
+        </form>
+        <p> <button class="btn btn-primary" type="submit" name="valid_action">Valider</button> </p>
+    </div>
+</body>
+</html>
