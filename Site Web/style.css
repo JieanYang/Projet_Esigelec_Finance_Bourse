@@ -1,0 +1,71 @@
+.red{
+    
+height: 900px ;
+ background-color: white ; 
+    background-size: cover;
+    
+}
+
+.oklm{
+
+
+    position: absolute;
+
+    width: 700px;
+
+    top: 200px;
+    left: 200px;
+
+}
+
+.dim {
+    
+    
+   position: relative;
+    
+    top: 30px;
+    left:  800px ;
+    
+}
+
+.place {
+    
+    position:relative;
+    
+    top: 10px;
+    left: 100px;
+    
+}
+.white{
+   
+    
+    height: 40px;
+    width: 400px;
+    background-color: darkgray;
+   border: 1px solid black ;
+    
+}
+.black{
+
+width: 800px;
+    
+    position: relative;
+    left: 205px;
+    
+}
+
+.bleu{
+    
+    color: blue;
+    
+}
+body>p {
+    
+    color: red ;
+    
+}
+
+#pp{
+    
+    color: black;
+}
