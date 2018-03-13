@@ -137,7 +137,7 @@
         .attr('class', 'chart__bars')
         .attr('x', function(d, i) { return x(d.date); })
         .attr('y', function(d) { return 155 - y3(d.volume); })
-        .attr('width', 1)
+        .attr('width', 10)
         .attr('height', function(d) { return y3(d.volume); });
 
 
@@ -221,7 +221,7 @@
 
         var days = Math.ceil((ext[1] - ext[0]) / (24 * 3600 * 1000))
         // focusGraph.attr('width', (40 > days) ? (40 - days) * 5 / 6 : 5)
-        focusGraph.attr('width', (200>days)?((130>days) ? ((40 > days) ? (40 - days) * 5 / 6 : 5):3):1)
+        focusGraph.attr('width', 10)
       }
 
       priceChart.attr('d', priceLine);

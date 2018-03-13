@@ -3,7 +3,7 @@
 
 <?php
 session_start();
-$_SESSION['choix_action']='Biomerieux'
+$_SESSION['choix_action']='Korian'
 ?>
 
 
@@ -64,7 +64,12 @@ $_SESSION['choix_action']='Biomerieux'
 		    		$Rendement = $tuple['Rendement'];
 		    		$PER = $tuple['PER'];
 		    		echo '<br>';
-					$list_action = array($tuple['date_action'], $tuple['dernier'], $tuple['volume']);
+					// $list_action = array($tuple['date_action'], $tuple['dernier'], $tuple['volume']);
+					$list_action = array(date('d/m/Y', strtotime($tuple['date_action'])) , $tuple['dernier'], $tuple['volume']);
+					// echo explode(' ' ,$list_action[0]);
+					// var_dump($list_action);
+					// echo explode(' ', $tuple['date_action']);
+
 					fputcsv($file, $list_action);
 		    	}
 		    }
