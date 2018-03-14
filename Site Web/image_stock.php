@@ -39,7 +39,7 @@ $_SESSION['choix_action']='Korian'
 			$result = mysqli_query($mysqli, $query);
 
 			$file = fopen('./data/aapl.csv', 'w');
-			$labels = array("Date","Volume","Close");
+			$labels = array("Date","Close","Volume");
 			fputcsv($file, $labels);
 			// fwrite($file, "Date\tVolume\tClose\t");
 			// fwrite($file, "Date\tVolume\tClose\t");
