@@ -7,16 +7,19 @@
     height   = 283 - margin.top - margin.bottom,
     height2  = 283 - margin2.top - margin2.bottom;
 
+  var height_plus = 40;
+
+
   var parseDate = d3.time.format('%d/%m/%Y').parse,
     bisectDate = d3.bisector(function(d) { return d.date; }).left,
     legendFormat = d3.time.format('%b %d, %Y');
-
+  
   var x = d3.time.scale().range([0, width]),
     x2  = d3.time.scale().range([0, width]),
     y   = d3.scale.linear().range([height, 0]),
     y1  = d3.scale.linear().range([height, 0]),
     y2  = d3.scale.linear().range([height2, 0]),
-    y3  = d3.scale.linear().range([0, 60]);
+    y3  = d3.scale.linear().range([0, 60 + height_plus]);
 
   var xAxis = d3.svg.axis().scale(x).orient('bottom'),
     xAxis2  = d3.svg.axis().scale(x2).orient('bottom'),
@@ -41,7 +44,7 @@
   var svg = d3.select('#image_stock').append('svg')
     .attr('class', 'chart')
     .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom + 60);
+    .attr('height', height + height_plus + margin.top + margin.bottom + 60);
 
   svg.append('defs').append('clipPath')
     .attr('id', 'clip')
@@ -60,14 +63,15 @@
     .attr('class', 'focus')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
+
   var barsGroup = svg.append('g')
     .attr('class', 'volume')
     .attr('clip-path', 'url(#clip)')
-    .attr('transform', 'translate(' + margin.left + ',' + (margin.top + 60 + 20) + ')');
+    .attr('transform', 'translate(' + margin.left + ',' + (margin.top + 60 + 20 + height_plus) + ')');
 
   var context = svg.append('g')
     .attr('class', 'context')
-    .attr('transform', 'translate(' + margin2.left + ',' + (margin2.top + 60) + ')');
+    .attr('transform', 'translate(' + margin2.left + ',' + (margin2.top + 60 + height_plus) + ')');
 
   var legend = svg.append('g')
     .attr('class', 'chart__legend')
@@ -154,11 +158,11 @@
       .style('display', 'none')
       .attr('r', 2.5);
 
-    var averageTooltip = focus.append('g')
-      .attr('class', 'chart__tooltip--average')
-      .append('circle')
-      .style('display', 'none')
-      .attr('r', 2.5);
+    // var averageTooltip = focus.append('g')
+    //   .attr('class', 'chart__tooltip--average')
+    //   .append('circle')
+    //   .style('display', 'none')
+    //   .attr('r', 2.5);
 
     var mouseArea = svg.append('g')
       .attr('class', 'chart__mouse')
@@ -170,12 +174,12 @@
       .on('mouseover', function() {
         helper.style('display', null);
         priceTooltip.style('display', null);
-        averageTooltip.style('display', null);
+        // averageTooltip.style('display', null);
       })
       .on('mouseout', function() {
         helper.style('display', 'none');
         priceTooltip.style('display', 'none');
-        averageTooltip.style('display', 'none');
+        // averageTooltip.style('display', 'none');
       })
       .on('mousemove', mousemove);
 
@@ -205,7 +209,7 @@
       var d = x0 - d0.date > d1.date - x0 ? d1 : d0;
       helperText.text(legendFormat(new Date(d.date)) + ' - Price: ' + d.price + ' Avg: ' + d.average);
       priceTooltip.attr('transform', 'translate(' + x(d.date) + ',' + y(d.price) + ')');
-      averageTooltip.attr('transform', 'translate(' + x(d.date) + ',' + y(d.average) + ')');
+      // averageTooltip.attr('transform', 'translate(' + x(d.date) + ',' + y(d.average) + ')');
     }
 
     function brushed() {
