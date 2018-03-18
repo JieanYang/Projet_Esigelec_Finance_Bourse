@@ -4,13 +4,13 @@
 <head>
     <meta charset="utf-8" content="width=device-width">
     <title> FINANCE  </title>
-<!-- css -->     
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <!-- css -->     
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container-fluid red col-xs-4 col-sm-12 col-md-12 col-lg-12 " >
-            <img src="finance.jpg" style="position: absolute;left:380px;top: 20px" width="550px">  
+            <img src="悬崖上的金鱼姬.jpg" style="position: absolute;left:380px;top: 20px" width="550px">  
         <div style="border-color: black" width="50px">
             <h4> Mon portefeuille </h4>
         </div>
@@ -33,7 +33,7 @@
             <a class="btn btn-info" href="image_stock_Loreal.php">Consulter</a>
         </div>        
         <div >
-            <img src="Entreprise.png" style="position: absolute;top: 450px;left: 600px">
+            <img src="悬崖上的金鱼姬.jpg" style="position: absolute;top: 450px;left: 600px">
         </div>
     </div>        
 </body>
