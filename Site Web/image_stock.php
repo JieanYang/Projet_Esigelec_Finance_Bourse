@@ -2,10 +2,16 @@
 <html>
 
 <?php
-session_start();
-$_SESSION['choix_action']='Korian'
-?>
+$url = $_SERVER['REQUEST_URI'];
+$action = substr($url, stripos($url, '?')+1);
+// echo $action;
+if ($action == 'Sopra%20Steria%20Group'){
+	$action = str_replace('%20', ' ',$action);
+}
 
+session_start();
+$_SESSION['choix_action'] = $action;
+?>
 
 <head>
 	<meta charset="utf-8">
