@@ -85,33 +85,130 @@ $_SESSION['choix_action'] = $action;
 			?>
 		</div>
 		<div class="col-sm-4">
+			<div class="row">
+				<table class="table">
+				  <thead>
+				    <tr>
+				      <th scope="col">Cotation</th>
+				      <th scope="col"></th>
+				    </tr>
+				  </thead>
+				  <tbody>
+				    <tr>
+				      <th scope="row">BNA</th>
+				      <td id="BNA"><?php echo $BNA;?></td>
+				    </tr>
+				    <tr>
+				      <th scope="row">Dividende</th>
+				      <td id="Dividende"><?php echo $Dividende;?></td>
+				    </tr>
+				    <tr>
+				      <th scope="row">Rendement</th>
+				      <td id="Rendement"><?php echo $Rendement;?></td>
+				    </tr>
+				    <tr>
+				      <th scope="row">PER</th>
+				      <td id="PER"><?php echo $PER;?></td>
+				    </tr>
+				  </tbody>
+				</table>
+			</div>
+			<div class="row">
+				<?php
 
-			<table class="table">
-			  <thead>
-			    <tr>
-			      <th scope="col">Cotation</th>
-			      <th scope="col"></th>
-			    </tr>
-			  </thead>
-			  <tbody>
-			    <tr>
-			      <th scope="row">BNA</th>
-			      <td id="BNA"><?php echo $BNA;?></td>
-			    </tr>
-			    <tr>
-			      <th scope="row">Dividende</th>
-			      <td id="Dividende"><?php echo $Dividende;?></td>
-			    </tr>
-			    <tr>
-			      <th scope="row">Rendement</th>
-			      <td id="Rendement"><?php echo $Rendement;?></td>
-			    </tr>
-			    <tr>
-			      <th scope="row">PER</th>
-			      <td id="PER"><?php echo $PER;?></td>
-			    </tr>
-			  </tbody>
-			</table>
+				    $bdd = mysqli_connect('localhost','root','','bdd_if');//personnaliser selon ta base de données
+				    $query = "select * from ressources where nom_action = '$choix_action' order by date_action DESC";
+					// $query = "select * from ressources where nom_action = '$choix_action' order by date_action";
+				    $reponse = mysqli_query($bdd, $query);
+
+					$i=0;
+					while(true){
+						$row = $reponse -> fetch_array(MYSQLI_ASSOC);
+						$data[$i]=$row;
+						$i++;
+
+						if (!$row){
+						    break;
+						}
+					}
+					// echo $i;
+					// print_r($data);
+					// echo "<br>";
+					// print_r($data[21]);
+					// echo "<br>";
+					// print_r($data[21]['dernier']);
+
+
+					//récupération des données dans des arrays
+					for ($j=0; $j<(count($data)-1); $j++){
+						$dernier[$j] = $data[$j]['dernier'];
+						$haut[$j] = $data[$j]['haut'];
+						$bas[$j] = $data[$j]['bas'];
+						// echo $j;
+					}
+					// print_r($dernier);
+					// echo"<br>";
+					// echo "<br>haut and bas";
+					// print_r($haut);
+					// echo"<br>";
+					// print_r($bas);
+
+					//calcul des K sur 14 jours
+					// detect max and min for 14 days
+					
+					for($j=0;$j<(count($dernier)-14);$j++) {
+						for($i=(0+$j);$i<=(14+$j);$i++) {
+							if($i==(0+$j)){
+								$max_14[$j] = $haut[$i];
+								$min_14[$j] = $bas[$i];
+							}else{
+								if($max_14[$j] < $haut[$i])
+									$max_14[$j] = $haut[$i];
+								if($min_14[$j] > $bas[$i])
+									$min_14[$j] = $bas[$i];
+							}
+						}
+					}
+					// echo "<br>max and min for 14 days";
+					// echo"<br>";
+					// print_r($max_14);
+					// echo"<br>";
+					// print_r($min_14);
+
+					for($i=0;$i<count($max_14);$i++) {
+						$k[$i] = 100*($dernier[$i]-$min_14[$i])/($max_14[$i]-$min_14[$i]);
+					}
+					// echo"<br>";
+					echo "<br>K index = ".$k[0];
+					echo"<br>";
+					// print_r($k);
+					// echo "<br>";
+				    
+				    // calcul du stochastiques et des résistances, à exécuter tous les jours (au lancement par exemple)
+				    
+				    if($k[0]>80){
+				        $instruction = -5;//stochastique sort de la zone de sur-achat (vente)
+				    }
+				    else{
+				        if($k[0]<20){
+				            $instruction = 5;//stochastique sort de la zone de sur-vente (signal d'achat)
+				        }
+				        else{
+				            $instruction =0;
+				        }
+				    }
+				    // echo "<br>first juge";
+				    // echo "<br>".$instruction."<br>";
+
+
+				    if ($instruction==5)
+				    	echo "ACHETER";
+				    elseif ($instruction==-5)
+				    	echo "VENDRE";
+				    else
+				    	echo "NE RIEN FAIRE";
+				?>
+			</div>
 		</div>
 	</div>
 
