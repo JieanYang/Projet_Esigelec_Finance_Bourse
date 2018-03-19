@@ -14,22 +14,25 @@ import MySQLdb
 import xlrd
 import datetime
 
-bourse_name = ['Sopra Steria Group', 'Korian', 'Airbus', 'L_oreal', 'Biomerieux']
+bourse_name = ['Sopra Steria Group', 'Korian', 'Airbus', 'L_oreal', 'Biomerieux', 'Danone']
 bourse_link = {'Sopra Steria Group': 'https://www.abcbourse.com/download/download.aspx?s=SOPp',\
 				'Korian': 'https://www.abcbourse.com/download/download.aspx?s=KORIp',\
 				'Airbus': 'https://www.abcbourse.com/download/download.aspx?s=AIRp',\
 				'L_oreal': 'https://www.abcbourse.com/download/download.aspx?s=ORp',\
-				'Biomerieux': 'https://www.abcbourse.com/download/download.aspx?s=BIMp'}
+				'Biomerieux': 'https://www.abcbourse.com/download/download.aspx?s=BIMp',\
+				'Danone': 'https://www.abcbourse.com/download/download.aspx?s=BNp'}
 bourse_file_name = {'Sopra Steria Group': 'SOP',\
 					'Korian': 'KORI',\
 					'Airbus': 'AIR',\
 					'L_oreal': 'OR',\
-					'Biomerieux': 'BIM'}
+					'Biomerieux': 'BIM',\
+					'Danone': 'BN'}
 bourse_code = {'FR0000050809': 'Sopra Steria Group',\
 				'FR0010386334': 'Korian',\
 				'NL0000235190': 'Airbus',\
 				'FR0000120321': 'L_oreal',\
-				'FR0013280286': 'Biomerieux'}
+				'FR0013280286': 'Biomerieux',\
+				'FR0000120644': 'Danone'}
   
 
 def convert_to_xlsx(nom):
@@ -82,14 +85,14 @@ def move_text(nom):
 	shutil.move(path_download + bourse_file_name[nom] + '.txt', path_projet + bourse_file_name[nom] + '.txt')
 	os.chdir(path_projet)
 
-def insert_db_data_history():
+def insert_db_data_history(): 
 	db = MySQLdb.Connect(host="127.0.0.1", port=3306, user="root", passwd="", db="bdd_if")
 	cursor = db.cursor()
 
 	cursor.execute("DELETE FROM ressources")
 
 
-	for i in range(5):
+	for i in range(len(bourse_name)):
 		# -----------------------------------------------------------------
 		# data dans xlsx
 		data = xlrd.open_workbook('prix_action_' + bourse_file_name[bourse_name[i]] +'.xlsx')
@@ -119,7 +122,7 @@ def insert_db_data_history():
 
 	db.close()
 
-def crawl_data_action_prix_5(nom):
+def crawl_data_action_prix_allBourses(nom):
 	download_text(nom)
 	time.sleep(3)
 	move_text(nom)
@@ -131,16 +134,18 @@ def crawl_data_action_analyse_actualite():
 								'Korian': 'http://www.boursorama.com/cours.phtml?symbole=1rPKORI',\
 								'Airbus': 'http://www.boursorama.com/cours.phtml?symbole=1rPAIR',\
 								'L_oreal': 'http://www.boursorama.com/cours.phtml?symbole=1rPOR',\
-								'Biomerieux': 'http://www.boursorama.com/cours.phtml?symbole=1rPBIM'}
+								'Biomerieux': 'http://www.boursorama.com/cours.phtml?symbole=1rPBIM',\
+								'Danone': 'http://www.boursorama.com/cours.phtml?symbole=1rPBN'}
 	data_analyse_actualite = {'Sopra Steria Group': [],\
 								'Korian': [],\
 								'Airbus': [],\
 								'L_oreal': [],\
-								'Biomerieux': []}
+								'Biomerieux': [],\
+								'Danone': []}
 
 	driver = webdriver.Chrome()
 
-	for i in range(5):
+	for i in range(len(bourse_name)):
 		driver.get(bourse_data_analyse_link[bourse_name[i]]) # 暂时
 		html = driver.find_element_by_id("AnalystsPrevisions").get_attribute('outerHTML')
 		soup = BeautifulSoup(html, features="lxml")
@@ -153,7 +158,7 @@ def crawl_data_action_analyse_actualite():
 				if(k == 1):
 					data_analyse_actualite[bourse_name[i]].append(td.string.encode('utf-8'))
 				k = k + 1
-	print(data_analyse_actualite)
+	# print(data_analyse_actualite)
 	driver.close()
 
 
@@ -163,7 +168,7 @@ def crawl_data_action_analyse_actualite():
 
 	labels = ['nom', 'BNA', 'Dividende', 'Rendement', 'PER', 'actualite']
 	sheet.write_row(0,0,labels)
-	for i in range(5):
+	for i in range(len(bourse_name)):
 		sheet.write_row(i+1, 0, [bourse_name[i]] + data_analyse_actualite[bourse_name[i]])
 	wb.close()
 
@@ -202,13 +207,14 @@ def insertDB_data_analyse():
 # ---------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+
 	print('Start crawl data history . . .')
-	for i in range(5):
-		crawl_data_action_prix_5(bourse_name[i])
+	for i in range(len(bourse_name)):
+		crawl_data_action_prix_allBourses(bourse_name[i])
 	insert_db_data_history()
 	print('Finished crawl data history!');
 
-
+	print('='*64)
 	print('Start crawl data base . . .')
 	crawl_data_action_analyse_actualite()
 	insertDB_data_analyse()
