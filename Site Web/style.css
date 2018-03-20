@@ -23,9 +23,15 @@ height: 900px ;
     
    position: relative;
     
-    top: 30px;
-    left:  800px ;
-    
+    top: 450px;
+    left:  100px ;
+
+    background-color: white;
+    width: 170px;
+    height: 200px;
+    border-width:3px;
+ border-style:double;
+ border-color:black;
 }
 
 .place {
